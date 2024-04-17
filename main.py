@@ -1,25 +1,34 @@
-
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi import FastAPI, HTTPException
+import httpx
 
 app = FastAPI()
 
+@app.post("/send_message")
+async def send_message():
+    access_token = "EAAFtnme63bgBO4dI02BeZBfowFGaSZAcm9sgAVmZA0IarGlnSomZAr2ZARjq3iSFZCnl6AemptVf9918XdAWa1pkuQ8t8ZCA51RrlHYcWSTe4VDF1Y9j6ZBUz7RuL2LXrK8yLdD78FMLQ64vx32ZBF7rZA87BO9tvtQ7ljlTAlqgp386BnzjjTSxwsUxr4R9ZBUPSyd"
+    graph_api_url = "https://graph.facebook.com/v18.0/273242249210974/messages"
 
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
 
+    request_body = {
+        "messaging_product": "whatsapp",
+        "to": "6369135307",
+        "type": "template",
+        "template": {
+            "name": "hello_world",
+            "language": {
+                "code": "en_US"
+            }
+        }
+    }
 
-# Allow all origins, methods, and headers for testing purposes.
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(graph_api_url, headers=headers, json=request_body)
 
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail="Failed to send message")
 
-
-@app.get("/")
-def first():
-    return {"hello": "world"}
+    return {"message": "Message sent successfully", "result": response.json()}
