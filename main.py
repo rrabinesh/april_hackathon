@@ -1,10 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
+from typing import Optional
 import httpx
 
 app = FastAPI()
 
-@app.post("/send_message")
-async def send_message():
+@app.post("/send_message/{to}/{template_name}/")
+async def send_message(to: str,template_name: str):
     access_token = "EAAFtnme63bgBO4dI02BeZBfowFGaSZAcm9sgAVmZA0IarGlnSomZAr2ZARjq3iSFZCnl6AemptVf9918XdAWa1pkuQ8t8ZCA51RrlHYcWSTe4VDF1Y9j6ZBUz7RuL2LXrK8yLdD78FMLQ64vx32ZBF7rZA87BO9tvtQ7ljlTAlqgp386BnzjjTSxwsUxr4R9ZBUPSyd"
     graph_api_url = "https://graph.facebook.com/v18.0/273242249210974/messages"
 
@@ -15,10 +16,10 @@ async def send_message():
 
     request_body = {
         "messaging_product": "whatsapp",
-        "to": "6369135307",
+        "to": to,
         "type": "template",
         "template": {
-            "name": "hello_world",
+            "name": template_name,
             "language": {
                 "code": "en_US"
             }
